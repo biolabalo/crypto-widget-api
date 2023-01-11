@@ -11,16 +11,4 @@ export class ExchangeRateService {
   findAll() {
     return `This action returns all exchangeRate`;
   }
-
-  findOne(id: number) {
-    return `This action returns a #${id} exchangeRate`;
-  }
-
-  update(id: number, updateExchangeRateDto: UpdateExchangeRateDto) {
-    return `This action updates a #${id} exchangeRate`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} exchangeRate`;
-  }
 }

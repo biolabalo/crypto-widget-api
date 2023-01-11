@@ -1,10 +1,10 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { Document } from 'mongoose';
 
-export type RateDocument = Rate & Document;
+export type ExchangeRateDocument = ExchangeRate & Document;
 
 @Schema()
-export class Rate {
+export class ExchangeRate {
     @Prop({ required:true })
     amountFrom: Number;
     
@@ -26,6 +26,6 @@ export class Rate {
 
 }
 
-export const RateSchema = SchemaFactory.createForClass(Rate);
+export const ExchangeRateSchema = SchemaFactory.createForClass(ExchangeRate);
 
 

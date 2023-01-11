@@ -16,19 +16,4 @@ export class ExchangeRateController {
   findAll() {
     return this.exchangeRateService.findAll();
   }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.exchangeRateService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateExchangeRateDto: UpdateExchangeRateDto) {
-    return this.exchangeRateService.update(+id, updateExchangeRateDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.exchangeRateService.remove(+id);
-  }
 }

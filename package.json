@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "description": "",
   "engines": {
-    "node": ">=20.4.0",
+    "node": ">=19.4.0",
     "npm": "9.2.0"
   },
   "author": "Akeem balogun",

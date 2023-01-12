@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
 import { CreateExchangeRateDto } from './dto/create-exchange-rate.dto';
-import { UpdateExchangeRateDto } from './dto/update-exchange-rate.dto';
 
 @Injectable()
 export class ExchangeRateService {

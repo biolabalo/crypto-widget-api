@@ -1,5 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
+import { config } from 'dotenv';
+config();
 
 async function bootstrap() {
   // Make sure we are running node 19.4.0

@@ -22,7 +22,7 @@ export class ExchangeRate {
     createdAt: Date;
 
     @Prop({ default: "live_price" , enum: ['live_price', 'exchanged'], required:true})
-    extType: String;
+    type: String;
 
 }
 

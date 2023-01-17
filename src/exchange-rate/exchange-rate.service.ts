@@ -1,12 +1,15 @@
 import { Injectable } from '@nestjs/common';
+import { InjectModel } from "@nestjs/mongoose";
+import { FilterQuery, Model } from "mongoose";
 import { CreateExchangeRateDto } from './dto/create-exchange-rate.dto';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { config } from 'dotenv';
+import { ExchangeRateDocument , ExchangeRate} from './schemas/exchange-rate.schema'
 config();
 
-console.log(process.env.CONFIGURABLE_CRON_TIME, '.........', process.env.DATABASE_URL)
 @Injectable()
 export class ExchangeRateService {
+  constructor(@InjectModel(ExchangeRate.name) private  exchangeRateModel: Model<ExchangeRateDocument>) {}
   /*
    * cron job is invoked once the application server start
    * which at a set time calls the fetchRatesAndStreamToClients method
@@ -21,11 +24,11 @@ export class ExchangeRateService {
     console.log('cron job running....');
   }
 
-  create(createExchangeRateDto: CreateExchangeRateDto) {
-    return 'This action adds a new exchangeRate';
+  async create(createExchangeRateDto: CreateExchangeRateDto): Promise<ExchangeRate> {
+    return new this.exchangeRateModel(createExchangeRateDto).save()
   }
 
   findAll() {
-    return `This action returns all exchangeRate`;
+    return ``;
   }
 }

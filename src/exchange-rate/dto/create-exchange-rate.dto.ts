@@ -7,7 +7,7 @@ import {
     IsOptional,
   } from 'class-validator';
 
-  import { ExchangeType } from '../interfaces/exchange-rate.interface';
+import { ExchangeType } from '../interfaces/exchange-rate.interface';
 
 export class CreateExchangeRateDto {
 

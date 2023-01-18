@@ -11,8 +11,8 @@ export class ExchangeRateController {
     return this.exchangeRateService.create(createExchangeRateDto);
   }
 
-  @Get()
-  findAll() {
-    return this.exchangeRateService.findAll();
-  }
+  // @Get()
+  // findAll() {
+  //   return this.exchangeRateService.findAll();
+  // }
 }

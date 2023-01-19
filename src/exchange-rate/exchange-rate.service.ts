@@ -1,4 +1,5 @@
 import { Injectable, Query } from '@nestjs/common';
+import axios from 'axios';
 import { InjectModel } from '@nestjs/mongoose';
 import {  Model } from 'mongoose';
 import { CreateExchangeRateDto } from './dto/create-exchange-rate.dto';
@@ -27,6 +28,38 @@ export class ExchangeRateService {
     return this.fetchRatesAndStreamToClients();
   }
 
+  async getRatesByCurrency(
+    currencyBase = 'BTC',
+    currencies = ['USD', 'EUR', 'GBP'],
+  ): Promise<CreateExchangeRateDto[]> {
+    const apiUrl = 'https://rest.coinapi.io/v1/exchangerate';
+    const apiKey =  '57C9E701-2251-4E2D-9673-8E40BDF20240';
+ 
+    return axios
+      .get(`${apiUrl}/${currencyBase}`, {
+        headers: {
+          'X-CoinAPI-Key': apiKey,
+        },
+        params: {
+          invert: false,
+          filter_asset_id: currencies.join(),
+        },
+      })
+      .then(({ data: { asset_id_base = '', rates = [] } }) =>
+        rates?.map((rate) => ({
+          currencyFrom: asset_id_base,
+          amountFrom: 1,
+          currencyTo: rate?.asset_id_quote,
+          amountTo: rate?.rate,
+          type: 'live_price',
+        })),
+      )
+      .catch((err) => {
+        console.log('Error to get rate in external API: ' + err.message);
+        return [];
+      });
+  }
+
   async fetchRatesAndStreamToClients() {
     console.log('cron job running....');
   }
@@ -43,8 +76,7 @@ export class ExchangeRateService {
     type,
     fromDate,
     toDate,
-  }: GetAllExchangeRateDto) {
-    console.log(fromDate, toDate,)
+  }: GetAllExchangeRateDto, isPaginated: boolean) {
     let query = {};
     let countQuery = [];
     let dateQuery = [];
@@ -85,6 +117,6 @@ export class ExchangeRateService {
       .limit(limit)
       .exec();
 
-    return { data, count };
+    return isPaginated ? { data, count, page } :  { data, count };
   }
 }

@@ -2,7 +2,6 @@ import {
     IsNumber,
     IsString,
     MinLength,
-    MaxLength,
     Matches,
     IsOptional,
   } from 'class-validator';
@@ -13,7 +12,6 @@ export class CreateExchangeRateDto {
 
   @IsString()
   @MinLength(2)
-  @MaxLength(5)
   @Matches('^[A-Z]*$')
   currencyFrom: string;
 
@@ -22,7 +20,6 @@ export class CreateExchangeRateDto {
 
   @IsString()
   @MinLength(2)
-  @MaxLength(5)
   @Matches('^[A-Z]*$')
   currencyTo: string;
 

@@ -39,8 +39,8 @@ export class ExchangeRateService {
     });
 
     const savedLivePrices = await this.createMany(createExchangeRateDtos);
-
-     return savedLivePrices
+    const count = await this.exchangeRateModel.countDocuments({});
+     return  { savedLivePrices , count }
   }
 
   async getExternalRate() {

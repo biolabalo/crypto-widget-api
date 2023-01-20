@@ -15,7 +15,7 @@ These instructions will guide you in setting up a copy of the project on your lo
 
 ### Installation
 1. Navigate to the project directory: `cd crypto-widget-api`
-2. Install the dependencies: `npm install`
+2. Install the dependencies: `npm install` , 
 
 ## Environment Variables
 
@@ -23,6 +23,7 @@ To run this project, you will need to add the following environment variables to
 
 - `DATABASE_URL`: MongoDB URL
 - `CONFIGURABLE_CRON_TIME`: Cron-like time format for the rate consumption and streaming interval
+- `XCoinAPIKey` : crpto api service key, key can be gotten from the [official website](https://www.coinapi.io/pricing?apikey)
 
 
 ## Running the App

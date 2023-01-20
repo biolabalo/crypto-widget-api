@@ -16,6 +16,7 @@ These instructions will guide you in setting up a copy of the project on your lo
 ### Installation
 1. Navigate to the project directory: `cd crypto-widget-api`
 2. Install the dependencies: `npm install` , 
+3. setup your `.env` file , check .env.sample for more information.
 
 ## Environment Variables
 

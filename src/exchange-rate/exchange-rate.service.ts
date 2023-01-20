@@ -1,7 +1,8 @@
 import { Injectable, Query } from '@nestjs/common';
+import { ExchangeRateGateway } from './exchange-rate.gateway';
 import axios from 'axios';
 import { InjectModel } from '@nestjs/mongoose';
-import {  Model } from 'mongoose';
+import { Model } from 'mongoose';
 import { CreateExchangeRateDto } from './dto/create-exchange-rate.dto';
 import { GetAllExchangeRateDto } from './dto/get-all-exhange-rate.dto';
 import { Cron, CronExpression } from '@nestjs/schedule';
@@ -10,6 +11,8 @@ import {
   ExchangeRateDocument,
   ExchangeRate,
 } from './schemas/exchange-rate.schema';
+import { ExchangeType } from './interfaces/exchange-rate.interface';
+
 config();
 
 @Injectable()
@@ -17,51 +20,65 @@ export class ExchangeRateService {
   constructor(
     @InjectModel(ExchangeRate.name)
     private exchangeRateModel: Model<ExchangeRateDocument>,
-  ) {}
-  /*
-   * cron job is invoked once the application server start
-   * which at a set time calls the fetchRatesAndStreamToClients method
-   * the time  can be set from the .env file
-   */
-  @Cron(process.env.CONFIGURABLE_CRON_TIME)
-  handleCron() {
-    return this.fetchRatesAndStreamToClients();
-  }
-
-  async getRatesByCurrency(
-    currencyBase = 'BTC',
-    currencies = ['USD', 'EUR', 'GBP'],
-  ): Promise<CreateExchangeRateDto[]> {
-    const apiUrl = 'https://rest.coinapi.io/v1/exchangerate';
-    const apiKey =  '57C9E701-2251-4E2D-9673-8E40BDF20240';
+  ) // private  exchangeRateGateway: ExchangeRateGateway
+  {}
  
-    return axios
-      .get(`${apiUrl}/${currencyBase}`, {
-        headers: {
-          'X-CoinAPI-Key': apiKey,
-        },
-        params: {
-          invert: false,
-          filter_asset_id: currencies.join(),
-        },
-      })
-      .then(({ data: { asset_id_base = '', rates = [] } }) =>
-        rates?.map((rate) => ({
-          currencyFrom: asset_id_base,
-          amountFrom: 1,
-          currencyTo: rate?.asset_id_quote,
-          amountTo: rate?.rate,
-          type: 'live_price',
-        })),
-      )
-      .catch((err) => {
-        console.log('Error to get rate in external API: ' + err.message);
-        return [];
-      });
+  async fetchRates() {
+    const response = await this.getExternalRate();
+
+    if (!response.length) return '';
+
+    const createExchangeRateDtos = response.map((r) => {
+      return {
+        currencyFrom: r.currencyFrom,
+        amountFrom: r.amountFrom,
+        currencyTo: r.currencyTo,
+        amountTo: r.amountTo,
+        type: r.type as ExchangeType,
+      };
+    });
+
+    const savedLivePrices = await this.createMany(createExchangeRateDtos);
+
+     return savedLivePrices
   }
 
-  async fetchRatesAndStreamToClients() {
-    console.log('cron job running....');
+  async getExternalRate() {
+    var options = {
+      method: 'GET',
+      hostname: 'rest.coinapi.io',
+      headers: { 'X-CoinAPI-Key': process.env.XCoinAPIKey },
+    };
+    const urls = [
+      'https://rest.coinapi.io/v1/exchangerate/BTC/USD',
+      'https://rest.coinapi.io/v1/exchangerate/ETH/USD',
+      'https://rest.coinapi.io/v1/exchangerate/BTC/EUR',
+    ];
+
+    const extractData = (response) => {
+      return {
+        currencyFrom: response.data.asset_id_base,
+        amountFrom: 1,
+        currencyTo: response.data.asset_id_quote,
+        amountTo: response.data.rate,
+        type: 'live_price',
+      };
+    };
+
+    const makeAPIcall = async () => {
+      try {
+        const responses = await Promise.all(
+          urls.map((url) => axios.get(url, options)),
+        );
+        const dataArray = responses.map((response) => extractData(response));
+        return dataArray;
+      } catch (error) {
+        console.log(error);
+        return [];
+      }
+    };
+
+    return makeAPIcall();
   }
 
   async create(
@@ -70,13 +87,19 @@ export class ExchangeRateService {
     return new this.exchangeRateModel(createExchangeRateDto).save();
   }
 
-  async findAll({
-    page = 1,
-    limit = 5,
-    type,
-    fromDate,
-    toDate,
-  }: GetAllExchangeRateDto, isPaginated: boolean) {
+  async createMany(
+    createExchangeRateDtos: CreateExchangeRateDto[],
+  ): Promise<ExchangeRate[]> {
+    const exchangeRates = createExchangeRateDtos.map(
+      (exchangeRateDto) => new this.exchangeRateModel(exchangeRateDto),
+    );
+    return this.exchangeRateModel.insertMany(exchangeRates);
+  }
+
+  async findAll(
+    { page = 1, limit = 5, type, fromDate, toDate }: GetAllExchangeRateDto,
+    isPaginated: boolean,
+  ) {
     let query = {};
     let countQuery = [];
     let dateQuery = [];
@@ -117,6 +140,6 @@ export class ExchangeRateService {
       .limit(limit)
       .exec();
 
-    return isPaginated ? { data, count, page } :  { data, count };
+    return isPaginated ? { data, count, page } : { data, count };
   }
 }

@@ -14,6 +14,6 @@ import { ExchangeRateModule } from './exchange-rate/exchange-rate.module';
     ExchangeRateModule
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, ExchangeRateModule],
 })
 export class AppModule {}

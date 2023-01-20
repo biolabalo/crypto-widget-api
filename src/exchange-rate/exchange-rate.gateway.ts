@@ -3,6 +3,7 @@ import {
   WebSocketServer,
   OnGatewayConnection,
 } from '@nestjs/websockets';
+import { Cron } from '@nestjs/schedule';
 import { ExchangeRateService } from './exchange-rate.service';
 import { CreateExchangeRateDto } from './dto/create-exchange-rate.dto';
 import { ExchangeType } from './interfaces/exchange-rate.interface';
@@ -13,15 +14,27 @@ const connected = 'connected';
 const filteredExchange = 'filteredExchange';
 const general = 'general';
 const fetchExchangeViaFilter = 'fetchExchangeViaFilter';
-const paginatedExchanges  = 'paginatedExchanges'
-const allExchange  = 'allExchange'
-const newExchange = 'newExchange'
-
+const paginatedExchanges = 'paginatedExchanges';
+const allExchange = 'allExchange';
+const newExchange = 'newExchange';
+const liveExchange = 'liveExchange'
 
 @WebSocketGateway(8001, { cors: '*' })
 export class ExchangeRateGateway implements OnGatewayConnection {
   @WebSocketServer() server;
   constructor(private readonly exchangeRateService: ExchangeRateService) {}
+
+  /*
+   * cron job is invoked once the application server start
+   * which at a set time calls the fetchRatesAndStreamToClients method
+   * the time  can be set from the .env file
+   */
+  @Cron(process.env.CONFIGURABLE_CRON_TIME)
+   async handleCron() {
+    const liveExchangeData = await this.exchangeRateService.fetchRates();
+    if(liveExchangeData) return this.server.emit(liveExchange, liveExchangeData);
+   
+  }
 
   handleConnection(client) {
     /*
@@ -97,10 +110,13 @@ export class ExchangeRateGateway implements OnGatewayConnection {
     toDate?: Date;
     type?: ExchangeType;
   }) {
-    const exchangeRateData = await this.exchangeRateService.findAll(query, false);
+    const exchangeRateData = await this.exchangeRateService.findAll(
+      query,
+      false,
+    );
     return this.server.emit(allExchange, exchangeRateData);
   }
-  
+
   private async getExchangeAndEmitToClientPaginated(query: {
     limit: number;
     page: number;
@@ -108,8 +124,10 @@ export class ExchangeRateGateway implements OnGatewayConnection {
     toDate?: Date;
     type?: ExchangeType;
   }) {
-    const exchangeRateData = await this.exchangeRateService.findAll(query, true);
+    const exchangeRateData = await this.exchangeRateService.findAll(
+      query,
+      true,
+    );
     return this.server.emit(paginatedExchanges, exchangeRateData);
   }
-  
 }

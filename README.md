@@ -23,7 +23,7 @@ To run this project, you will need to add the following environment variables to
 
 - `DATABASE_URL`: MongoDB URL
 - `CONFIGURABLE_CRON_TIME`: Cron-like time format for the rate consumption and streaming interval
-- `API_RATE`: API endpoint for fetching rate data
+
 
 ## Running the App
 

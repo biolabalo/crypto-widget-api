@@ -10,6 +10,10 @@ import { ExchangeRateModule } from './exchange-rate/exchange-rate.module';
   imports: [
     ConfigModule.forRoot(), 
     MongooseModule.forRoot(process.env.DATABASE_URL),
+    /**
+     * initializes the scheduler and registers any declarative cron jobs, that exist within your app
+     * when the onApplicationBootstrap lifecycle hook occurs,
+     */
     ScheduleModule.forRoot(),
     ExchangeRateModule
   ],

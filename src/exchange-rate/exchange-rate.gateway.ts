@@ -19,6 +19,15 @@ const allExchange = 'allExchange';
 const newExchange = 'newExchange';
 const liveExchange = 'liveExchange'
 
+/**
+ * A Nest gateway that enables 
+ * real-time, bidirectional and event-based communication between the browser and the server.
+ * 
+ * 
+ * 
+ * OnGatewayConnection is one of the 3 lifecycle hooks of websocket gateway, 
+ * it implement the handleConnection() method
+ */
 @WebSocketGateway(8001, { cors: '*' })
 export class ExchangeRateGateway implements OnGatewayConnection {
   @WebSocketServer() server;

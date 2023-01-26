@@ -1,11 +1,9 @@
-import { Injectable, Query } from '@nestjs/common';
-import { ExchangeRateGateway } from './exchange-rate.gateway';
+import { Injectable } from '@nestjs/common';
 import axios from 'axios';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { CreateExchangeRateDto } from './dto/create-exchange-rate.dto';
 import { GetAllExchangeRateDto } from './dto/get-all-exhange-rate.dto';
-import { Cron, CronExpression } from '@nestjs/schedule';
 import { config } from 'dotenv';
 import {
   ExchangeRateDocument,
@@ -15,13 +13,17 @@ import { ExchangeType } from './interfaces/exchange-rate.interface';
 
 config();
 
+/*
+* Decorator that marks a class as a provider. 
+* add the ExchangeRateService tot list of exchangeRatesModule's list of providers
+* Providers can be injected into other classes via constructor parameter injection using Nest's built-in Dependency Injection (DI) system.
+*/
 @Injectable()
 export class ExchangeRateService {
   constructor(
     @InjectModel(ExchangeRate.name)
     private exchangeRateModel: Model<ExchangeRateDocument>,
-  ) // private  exchangeRateGateway: ExchangeRateGateway
-  {}
+  ){}
  
   async fetchRates() {
     const response = await this.getExternalRate();

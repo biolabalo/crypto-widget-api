@@ -14,6 +14,12 @@ import { ExchangeRateModule } from './exchange-rate/exchange-rate.module';
     ExchangeRateModule
   ],
   controllers: [AppController],
-  providers: [AppService, ExchangeRateModule],
+  providers: [AppService],
 })
+
+/*
+ * root module. The root module is the starting point Nest uses 
+ * to build the application graph - the internal data structure Nest 
+ * uses to resolve module and provider relationships and dependencies
+*/
 export class AppModule {}
